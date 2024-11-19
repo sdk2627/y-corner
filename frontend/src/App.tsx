@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import 'bulma/css/bulma.min.css';
+import { EquipmentService } from './services/equipment.services';
 
 interface Equipment {
   id: number;
@@ -10,34 +11,32 @@ interface Equipment {
   image: string;
 }
 
-const initialEquipment: Equipment[] = [
-  { id: 1, name: "Basketball", category: "Ball Sports", city: "New York", price: 25, image: "https://picsum.photos/200" },
-  { id: 2, name: "Tennis Racket", category: "Racket Sports", city: "Los Angeles", price: 100, image: "https://picsum.photos/200" },
-  { id: 3, name: "Football", category: "Ball Sports", city: "Chicago", price: 30, image: "https://picsum.photos/200" },
-  { id: 4, name: "Yoga Mat", category: "Fitness", city: "Miami", price: 20, image: "https://picsum.photos/200" },
-  { id: 5, name: "Dumbbell Set", category: "Fitness", city: "New York", price: 150, image: "https://picsum.photos/200" },
-  { id: 6, name: "Soccer Cleats", category: "Footwear", city: "Los Angeles", price: 80, image: "https://picsum.photos/200" },
-];
-
 export default function SportEquipmentList() {
-  const [equipment, setEquipment] = useState<Equipment[]>(initialEquipment);
-  const [filteredEquipment, setFilteredEquipment] = useState<Equipment[]>(initialEquipment);
+  const [equipment, setEquipment] = useState<Equipment[]>([]);
+  const [filteredEquipment, setFilteredEquipment] = useState<Equipment[]>([]);
   const [filters, setFilters] = useState({
     category: '',
     city: '',
     minPrice: '',
     maxPrice: '',
   });
-
+  const equipmentService = new EquipmentService();
   const categories = Array.from(new Set(equipment.map(item => item.category)));
   const cities = Array.from(new Set(equipment.map(item => item.city)));
+
+  useEffect(() => {
+    equipmentService.getAllEquipment().then(data => {
+      setEquipment(data);
+      setFilteredEquipment(data);
+    });
+  }, []);
 
   useEffect(() => {
     const filtered = equipment.filter(item => {
       const categoryMatch = filters.category === '' || item.category === filters.category;
       const cityMatch = filters.city === '' || item.city === filters.city;
       const priceMatch = (filters.minPrice === '' || item.price >= Number(filters.minPrice)) &&
-                         (filters.maxPrice === '' || item.price <= Number(filters.maxPrice));
+        (filters.maxPrice === '' || item.price <= Number(filters.maxPrice));
       return categoryMatch && cityMatch && priceMatch;
     });
     setFilteredEquipment(filtered);
