@@ -1,18 +1,11 @@
 import { Equipment } from "../interfaces/Equipment.interface";
-import db from "../db/db.json";
+import { DatabaseService } from "./database.service";
 
-export interface Db {
-    equipment: Equipment[];
-}
-
-export class EquipmentService {
-    private db: Db;
-
-    public constructor() {
-        this.db = db;
-    }
+export class EquipmentService extends DatabaseService {
 
     public async getAllEquipment(): Promise<Equipment[]> {
-        return this.db.equipment;
+        const equipment = fetch(`${this.dbUrl}/equipment`);
+        return equipment.then(response => response.json());
     }
+
 }

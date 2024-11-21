@@ -1,8 +1,11 @@
+import { Category } from "./Category.interface";
+import { Image } from "./Image.interface";
+
 export interface Equipment {
     id: number;
     name: string;
-    category: string;
+    categories: Category[];
     city: string;
     price: number;
-    image: string;
+    image: Image[];
 }

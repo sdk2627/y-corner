@@ -28,6 +28,7 @@ class EquipmentController extends AbstractController
             AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function (object $object, ?string $format, array $context): string {
                 return $object->getName();
             },
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['equipment']
         ];
         $normalizer = new ObjectNormalizer(null, null, null, null, null, null, $defaultContext);
 

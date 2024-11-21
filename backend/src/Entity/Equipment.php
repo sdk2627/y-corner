@@ -45,6 +45,9 @@ class Equipment
     #[ORM\ManyToMany(targetEntity: Category::class, mappedBy: 'equipment')]
     private Collection $categories;
 
+    #[ORM\Column(length: 255)]
+    private ?string $city = null;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
@@ -158,6 +161,18 @@ class Equipment
         if ($this->categories->removeElement($category)) {
             $category->removeEquipment($this);
         }
+
+        return $this;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
+    public function setCity(string $city): static
+    {
+        $this->city = $city;
 
         return $this;
     }
