@@ -65,6 +65,7 @@ class EquipmentController extends AbstractController
 
         $equipment = new Equipment();
         $equipment->setName($data['name']);
+        $equipment->setCity($data['city']);
         $equipment->setPrice($data['price']);
         $equipment->setDescription($data['description']);
         $equipment->addImage($image);
