@@ -56,27 +56,29 @@ class EquipmentController extends AbstractController
     #[Route('/equipment', name: 'app_equipment_create', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-        $image = new Image();
-        $image->setContent($data['image']);
+        $datas = json_decode($request->getContent(), true);
+        foreach ($datas as $data) {
+            $image = new Image();
+            $image->setContent($data['image']);
 
-        $category = new Category();
-        $category->setName($data['category']);
+            $category = new Category();
+            $category->setName($data['category']);
 
-        $equipment = new Equipment();
-        $equipment->setName($data['name']);
-        $equipment->setCity($data['city']);
-        $equipment->setPrice($data['price']);
-        $equipment->setDescription($data['description']);
-        $equipment->addImage($image);
-        $equipment->addCategory($category);
-        
-        $entityManager->persist($image);
-        $entityManager->persist($category);
-        $entityManager->persist($equipment);
+            $equipment = new Equipment();
+            $equipment->setName($data['name']);
+            $equipment->setCity($data['city']);
+            $equipment->setPrice($data['price']);
+            $equipment->setDescription($data['description']);
+            $equipment->addImage($image);
+            $equipment->addCategory($category);
+
+            $entityManager->persist($image);
+            $entityManager->persist($category);
+            $entityManager->persist($equipment);
+        }
         $entityManager->flush();
 
-        return $this->json($equipment);
+        return $this->json($datas);
     }
 
     #[Route('/equipment/{id}', name: 'app_equipment_update', methods: ['PUT'])]
