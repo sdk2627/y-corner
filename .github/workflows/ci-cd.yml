@@ -21,7 +21,7 @@ jobs:
           - 3306:3306
         env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-          MYSQL_DATABASE: ycorner
+          MYSQL_DATABASE: ycorner_test
         options: >-
           --health-cmd="mysqladmin ping --silent"
           --health-interval=10s
