@@ -1,0 +1,86 @@
+name: CI/CD Pipeline for Symfony & React
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  # 1. Lancer les tests et la construction
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: ycorner
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install backend dependencies (Symfony)
+        run: |
+          cd backend
+          composer install
+          php bin/console doctrine:database:create --env=test
+          php bin/console doctrine:schema:update --force --env=test
+
+      - name: Run backend tests (Symfony)
+        run: |
+          cd backend
+          php bin/phpunit
+
+      - name: Install frontend dependencies (React)
+        run: |
+          cd frontend
+          npm install
+
+      - name: Run frontend tests (React)
+        run: |
+          cd frontend
+          npm test -- --watchAll=false
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+
+  # 2. Déploiement
+  # deploy:
+  #   needs: build-and-test
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/main'
+
+  #   steps:
+  #     # Étape 1 : Cloner le dépôt
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
+
+  #     # Étape 2 : Déploiement du frontend sur Vercel
+  #     - name: Deploy frontend to Vercel
+  #       env:
+  #         VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  #       run: |
+  #         cd frontend
+  #         npx vercel deploy --prod
+
+  #     # Étape 3 : Déploiement du backend
+  #     - name: Deploy backend
+  #       env:
+  #         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+  #       run: |
+  #         echo "Déploiement backend sur Railway ou un autre service"
