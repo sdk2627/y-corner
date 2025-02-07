@@ -10,20 +10,31 @@ import { AuthentificationService } from '@/services/authentification.service';
 function App() {
   const auth = new AuthentificationService();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        await auth.refresh();
+        const response = await auth.refresh();
+        if(!response) {
+          setIsAuthenticated(false);
+          return;
+        }
         setIsAuthenticated(true);
       } catch (error) {
         console.error('Error checking authentication:', error);
         setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     checkAuth();
   }, []);
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <Router>

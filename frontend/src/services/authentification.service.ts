@@ -23,9 +23,13 @@ export class AuthentificationService extends DatabaseService {
     public logout(): void {
         localStorage.removeItem("token");
         localStorage.removeItem("refresh_token");
+        window.location.href = '/login';
     }
 
     public async refresh(): Promise<any> {
+        if(localStorage.getItem("token") === null) {
+            return false;
+        }
         try {
             return axios.post(`${import.meta.env.VITE_API_URL}/api/token/refresh`, {
                 refresh_token: localStorage.getItem("refresh_token")
