@@ -1,12 +1,60 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Reset your password{% endblock %}
+{% block title %}Reset your password - Y-Corner{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('styles/reset-password.css') }}">
+{% endblock %}
 
 {% block body %}
-    <h1>Reset your password</h1>
+    <div class="reset-password-container">
+        <h1 class="title">Set new password<span class="required">*</span></h1>
+        <p class="subtitle">Enter your new password below</p>
 
-    {{ form_start(resetForm) }}
-        {{ form_row(resetForm.plainPassword) }}
-        <button class="btn btn-primary">Reset password</button>
-    {{ form_end(resetForm) }}
+        {% for flash_error in app.flashes('reset_password_error') %}
+            <div class="form-error alert">
+                {{ flash_error }}
+            </div>
+        {% endfor %}
+
+        {{ form_start(resetForm, {'attr': {'class': 'reset-form'}}) }}
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                {{ form_widget(resetForm.plainPassword.first, {
+                    'attr': {
+                        'class': 'form-control' ~ (form_errors(resetForm.plainPassword.first) ? ' error' : ''),
+                        'placeholder': 'New password'
+                    }
+                }) }}
+                {% if form_errors(resetForm.plainPassword.first) %}
+                    <div class="form-error">
+                        {{ form_errors(resetForm.plainPassword.first) }}
+                    </div>
+                {% endif %}
+
+                {{ form_widget(resetForm.plainPassword.second, {
+                    'attr': {
+                        'class': 'form-control' ~ (form_errors(resetForm.plainPassword.second) ? ' error' : ''),
+                        'placeholder': 'Repeat Password'
+                    }
+                }) }}
+                {% if form_errors(resetForm.plainPassword.second) %}
+                    <div class="form-error">
+                        {{ form_errors(resetForm.plainPassword.second) }}
+                    </div>
+                {% endif %}
+
+                {% if form_errors(resetForm.plainPassword) %}
+                    <div class="form-error">
+                        {{ form_errors(resetForm.plainPassword) }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn-reset">
+                Reset password
+            </button>
+        {{ form_end(resetForm) }}
+    </div>
 {% endblock %}

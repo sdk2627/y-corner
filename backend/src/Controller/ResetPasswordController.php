@@ -8,6 +8,7 @@ use App\Form\ResetPasswordRequestFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +20,7 @@ use SymfonyCasts\Bundle\ResetPassword\Controller\ResetPasswordControllerTrait;
 use SymfonyCasts\Bundle\ResetPassword\Exception\ResetPasswordExceptionInterface;
 use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
 
-#[Route('/reset-password')]
+#[Route('/api/reset-password')]
 class ResetPasswordController extends AbstractController
 {
     use ResetPasswordControllerTrait;
@@ -35,22 +36,14 @@ class ResetPasswordController extends AbstractController
     #[Route('', name: 'app_forgot_password_request')]
     public function request(Request $request, MailerInterface $mailer): Response
     {
-        $form = $this->createForm(ResetPasswordRequestFormType::class);
-        $form->handleRequest($request);
+        $datas = json_decode($request->getContent(), true);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            /** @var string $email */
-            $email = $form->get('email')->getData();
+        $email = $datas['email'];
 
-            return $this->processSendingPasswordResetEmail(
-                $email,
-                $mailer
-            );
-        }
-
-        return $this->render('reset_password/request.html.twig', [
-            'requestForm' => $form,
-        ]);
+        return $this->processSendingPasswordResetEmail(
+            $email,
+            $mailer
+        );
     }
 
     /**
@@ -112,15 +105,14 @@ class ResetPasswordController extends AbstractController
 
             /** @var string $plainPassword */
             $plainPassword = $form->get('plainPassword')->getData();
-
-            // Encode(hash) the plain password, and set it.
             $user->setPassword($passwordHasher->hashPassword($user, $plainPassword));
             $this->entityManager->flush();
 
             // The session is cleaned up after the password has been changed.
             $this->cleanSessionAfterReset();
 
-            return $this->redirectToRoute('app_home');
+            // Redirect directly to the frontend login page
+            return new RedirectResponse($_ENV['FRONTEND_URL'] . '/login');
         }
 
         return $this->render('reset_password/reset.html.twig', [
