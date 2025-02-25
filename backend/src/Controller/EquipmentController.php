@@ -44,15 +44,6 @@ class EquipmentController extends AbstractController
         return new JsonResponse($equipment, Response::HTTP_OK, [], true);
     }
 
-    #[Route('/api/equipment/{id}', name: 'app_equipment_show', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function show(int $id): JsonResponse
-    {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'id' => $id
-        ]);
-    }
-
     #[Route('/api/equipment', name: 'app_equipment_create', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
