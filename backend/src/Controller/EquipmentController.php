@@ -36,15 +36,15 @@ class EquipmentController extends AbstractController
         $this->serialize = $serializer;
     }
 
-    #[Route('/equipment', name: 'app_equipment', methods: ['GET'])]
-    public function index(EntityManagerInterface $entityManager, ): JsonResponse
+    #[Route('/api/equipment', name: 'app_equipment', methods: ['GET'])]
+    public function index(EntityManagerInterface $entityManager): JsonResponse
     {
         $data = $entityManager->getRepository(Equipment::class)->findAll();
         $equipment = $this->serialize->serialize($data, 'json');
         return new JsonResponse($equipment, Response::HTTP_OK, [], true);
     }
 
-    #[Route('/equipment/{id}', name: 'app_equipment_show', methods: ['GET'])]
+    #[Route('/api/equipment/{id}', name: 'app_equipment_show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function show(int $id): JsonResponse
     {
         return $this->json([
@@ -53,7 +53,7 @@ class EquipmentController extends AbstractController
         ]);
     }
 
-    #[Route('/equipment', name: 'app_equipment_create', methods: ['POST'])]
+    #[Route('/api/equipment', name: 'app_equipment_create', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $datas = json_decode($request->getContent(), true);
@@ -81,7 +81,7 @@ class EquipmentController extends AbstractController
         return $this->json($datas);
     }
 
-    #[Route('/equipment/{id}', name: 'app_equipment_update', methods: ['PUT'])]
+    #[Route('/api/equipment/{id}', name: 'app_equipment_update', methods: ['PUT'])]
     public function update(int $id): JsonResponse
     {
         return $this->json([
@@ -90,7 +90,7 @@ class EquipmentController extends AbstractController
         ]);
     }
 
-    #[Route('/equipment/{id}', name: 'app_equipment_delete', methods: ['DELETE'])]
+    #[Route('/api/equipment/{id}', name: 'app_equipment_delete', methods: ['DELETE'])]
     public function delete(int $id): JsonResponse
     {
         return $this->json([
