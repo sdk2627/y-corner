@@ -36,7 +36,7 @@ class EquipmentController extends AbstractController
         $this->serialize = $serializer;
     }
 
-    #[Route('/api/equipment', name: 'app_equipment', methods: ['GET'])]
+    #[Route('/api/equipments', name: 'app_equipment', methods: ['GET'])]
     public function index(EntityManagerInterface $entityManager): JsonResponse
     {
         $data = $entityManager->getRepository(Equipment::class)->findAll();
@@ -44,13 +44,11 @@ class EquipmentController extends AbstractController
         return new JsonResponse($equipment, Response::HTTP_OK, [], true);
     }
 
-    #[Route('/api/equipment/{id}', name: 'app_equipment_show', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function show(int $id): JsonResponse
+    #[Route('/api/equipment/{id}', name: 'app_equipment_show', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function show(int $id, EntityManagerInterface $entityManager): JsonResponse
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'id' => $id
-        ]);
+		$equipment = $entityManager->getRepository(Equipment::class)->find($id);
+        return new JsonResponse($equipment, Response::HTTP_OK, [], true);
     }
 
     #[Route('/api/equipment', name: 'app_equipment_create', methods: ['POST'])]
@@ -81,7 +79,7 @@ class EquipmentController extends AbstractController
         return $this->json($datas);
     }
 
-    #[Route('/api/equipment/{id}', name: 'app_equipment_update', methods: ['PUT'])]
+    #[Route('/api/equipment/{id}/edit', name: 'app_equipment_update', methods: ['PUT'])]
     public function update(int $id): JsonResponse
     {
         return $this->json([
@@ -90,12 +88,12 @@ class EquipmentController extends AbstractController
         ]);
     }
 
-    #[Route('/api/equipment/{id}', name: 'app_equipment_delete', methods: ['DELETE'])]
-    public function delete(int $id): JsonResponse
+    #[Route('/api/equipment/{id}/delete', name: 'app_equipment_delete', methods: ['DELETE'])]
+    public function delete(int $id, EntityManagerInterface $entityManager): JsonResponse
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'id' => $id
-        ]);
+		$entityManager->remove($entityManager->find(Equipment::class, $id));
+		$entityManager->flush();
+
+		return new JsonResponse([], Response::HTTP_OK);
     }
 }
